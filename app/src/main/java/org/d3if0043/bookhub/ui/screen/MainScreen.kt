@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import org.d3if0043.bookhub.R
 import org.d3if0043.bookhub.model.Book
+import org.d3if0043.bookhub.network.ApiStatus
 import org.d3if0043.bookhub.network.BookApi
 import org.d3if0043.bookhub.ui.theme.BookHubTheme
 
@@ -62,18 +64,34 @@ fun MainScreen() {
 fun ScreenContent(modifier: Modifier) {
     val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
+    val status by viewModel.status.collectAsState()
 
-    LazyVerticalGrid(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .padding(4.dp),
-        columns = GridCells.Fixed(2)
-    ) {
-        items(data) {
-            ListItem(book = it)
+    when(status) {
+        ApiStatus.LOADING -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+//                CircularProgressIndicator()
+            }
+        }
+
+        ApiStatus.SUCCESS -> {
+            LazyVerticalGrid(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .padding(4.dp),
+                columns = GridCells.Fixed(2)
+            ) {
+                items(data) {
+                    ListItem(book = it)
+                }
+            }
+
         }
     }
+
 }
 
 @Composable

@@ -34,3 +34,5 @@ object BookApi {
         return "$imageUrl"
     }
 }
+
+enum class ApiStatus { LOADING, SUCCESS }
