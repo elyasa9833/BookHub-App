@@ -79,7 +79,9 @@ fun ScreenContent(modifier: Modifier) {
 @Composable
 fun ListItem(book: Book) {
     Box(
-        modifier = Modifier.padding(4.dp).border(1.dp, Color.Gray),
+        modifier = Modifier
+            .padding(4.dp)
+            .border(1.dp, Color.Gray),
         contentAlignment = Alignment.BottomCenter
     ) {
         AsyncImage(
@@ -90,6 +92,7 @@ fun ListItem(book: Book) {
             contentDescription = stringResource(id = R.string.gambar, book.id),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
+            error = painterResource(id = R.drawable.broken_image_24),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
