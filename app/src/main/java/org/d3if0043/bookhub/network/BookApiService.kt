@@ -29,4 +29,8 @@ object BookApi {
     val service: BookApiService by lazy {
         retrofit.create(BookApiService::class.java)
     }
+
+    fun getBookUrl(imageUrl: String): String {
+        return "$imageUrl"
+    }
 }
