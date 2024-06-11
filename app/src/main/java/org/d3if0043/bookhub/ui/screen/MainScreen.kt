@@ -54,14 +54,18 @@ import kotlinx.coroutines.launch
 import org.d3if0043.bookhub.BuildConfig
 import org.d3if0043.bookhub.R
 import org.d3if0043.bookhub.model.Book
+import org.d3if0043.bookhub.model.User
 import org.d3if0043.bookhub.network.ApiStatus
 import org.d3if0043.bookhub.network.BookApi
+import org.d3if0043.bookhub.network.UserDataStore
 import org.d3if0043.bookhub.ui.theme.BookHubTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val context = LocalContext.current
+    val dataStore = UserDataStore(context)
+    val user by dataStore.userFlow.collectAsState(User())
 
     Scaffold(
         topBar = {
@@ -75,7 +79,12 @@ fun MainScreen() {
                 ),
                 actions = {
                     IconButton(onClick = {
-                        CoroutineScope(Dispatchers.IO).launch { signIn(context) }
+                        if(user.email.isEmpty()) {
+                            CoroutineScope(Dispatchers.IO).launch { signIn(context, dataStore) }
+                        }
+                        else {
+                            Log.d("SIGN-IN", "User: $user")
+                        }
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.account_circle_24),
@@ -180,7 +189,7 @@ fun ListItem(book: Book) {
     }
 }
 
-private suspend fun signIn(context: Context) {
+private suspend fun signIn(context: Context, dataStore: UserDataStore) {
     val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.API_KEY)
@@ -193,18 +202,24 @@ private suspend fun signIn(context: Context) {
     try{
         val credentialManager = androidx.credentials.CredentialManager.create(context)
         val result = credentialManager.getCredential(context, request)
-        handleSignIn(result)
+        handleSignIn(result, dataStore)
     }catch (e: GetCredentialException) {
         Log.e("SIGN-IN", "Error:${e.errorMessage}")
     }
 }
 
-private fun handleSignIn(result: GetCredentialResponse) {
+private suspend fun handleSignIn(
+    result: GetCredentialResponse,
+    dataStore: UserDataStore
+) {
     val credential = result.credential
     if(credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-            Log.d("SIGN-IN", "User email: ${googleId.id}")
+            val name = googleId.displayName ?: ""
+            val email = googleId.id
+            val photoUrl = googleId.profilePictureUri.toString()
+            dataStore.saveData(User(name, email, photoUrl))
         }catch (e: GoogleIdTokenParsingException) {
             Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
         }
