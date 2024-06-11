@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.d3if0043.bookhub.R
 import org.d3if0043.bookhub.ui.theme.BookHubTheme
 
@@ -40,6 +41,8 @@ fun MainScreen() {
 
 @Composable
 fun ScreenContent(modifier: Modifier) {
+    val viewModel: MainViewModel = viewModel()
+
     Column(
         modifier = modifier
             .fillMaxSize()
