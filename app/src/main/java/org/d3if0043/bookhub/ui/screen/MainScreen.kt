@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -41,9 +44,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -90,11 +96,26 @@ fun MainScreen() {
                             showDialog = true
                         }
                     }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.account_circle_24),
-                            contentDescription = stringResource(id = R.string.profil),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        if(user.email.isEmpty()) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.account_circle_24),
+                                contentDescription = stringResource(id = R.string.profil),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }else{
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(user.photoUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = stringResource(id = R.string.profil),
+                                contentScale = ContentScale.Crop,
+                                error = painterResource(id = R.drawable.broken_image_24),
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
                     }
                 }
             )
@@ -107,6 +128,7 @@ fun MainScreen() {
                 user = user,
                 onDismissRequest = { showDialog = false }
             ) {
+                CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
                 showDialog = false
             }
         }
@@ -213,7 +235,7 @@ private suspend fun signIn(context: Context, dataStore: UserDataStore) {
         .build()
 
     try{
-        val credentialManager = androidx.credentials.CredentialManager.create(context)
+        val credentialManager = CredentialManager.create(context)
         val result = credentialManager.getCredential(context, request)
         handleSignIn(result, dataStore)
     }catch (e: GetCredentialException) {
@@ -236,6 +258,18 @@ private suspend fun handleSignIn(
         }catch (e: GoogleIdTokenParsingException) {
             Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
         }
+    }
+}
+
+private suspend fun signOut(context: Context, dataStore: UserDataStore) {
+    try {
+        val credentialManager = CredentialManager.create(context)
+        credentialManager.clearCredentialState(
+            ClearCredentialStateRequest()
+        )
+        dataStore.saveData(User())
+    }catch (e: ClearCredentialException) {
+        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
