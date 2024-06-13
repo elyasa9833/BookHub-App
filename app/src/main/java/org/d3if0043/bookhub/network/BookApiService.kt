@@ -3,10 +3,17 @@ package org.d3if0043.bookhub.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.d3if0043.bookhub.model.Book
+import org.d3if0043.bookhub.model.OpStatus
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 
 private const val BASE_URL = "https://mainly-fond-cod.ngrok-free.app/d3if0043/"
 
@@ -22,6 +29,14 @@ private val retrofit = Retrofit.Builder()
 interface BookApiService {
     @GET("book.php")
     suspend fun getBook(): List<Book>
+
+    @Multipart
+    @POST("book.php")
+    suspend fun postBook(
+        @Header("Authorization") userId: String,
+        @Part("title") title: RequestBody,
+        @Part image: MultipartBody.Part
+    ): OpStatus
 
 }
 

@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -88,6 +90,10 @@ fun MainScreen() {
     val context = LocalContext.current
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
+
+    val viewModel: MainViewModel = viewModel()
+    val errorMessage by viewModel.errorMessage
+
     var showDialog by remember { mutableStateOf(false) }
     var showBookDialog by remember { mutableStateOf(false) }
 
@@ -158,7 +164,7 @@ fun MainScreen() {
             }
         }
     ) { padding ->
-        ScreenContent(Modifier.padding(padding))
+        ScreenContent(viewModel, Modifier.padding(padding))
 
         if(showDialog) {
             ProfilDialog(
@@ -174,16 +180,19 @@ fun MainScreen() {
             BookDialog(
                 bitmap = bitmap,
                 onDismissRequest = { showBookDialog = false }) { title ->
-                Log.d("TAMBAH", "$title ditambahkan.")
+                viewModel.saveData(user.email, title, bitmap!!)
                 showBookDialog = false
             }
+        }
+        if (errorMessage != null) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearMessage()
         }
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier) {
-    val viewModel: MainViewModel = viewModel()
+fun ScreenContent(viewModel: MainViewModel, modifier: Modifier) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
@@ -253,6 +262,7 @@ fun ListItem(book: Book) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
+                .height(150.dp)
         )
         Column(
             modifier = Modifier
