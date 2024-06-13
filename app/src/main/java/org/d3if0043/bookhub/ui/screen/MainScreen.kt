@@ -89,10 +89,12 @@ fun MainScreen() {
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
     var showDialog by remember { mutableStateOf(false) }
+    var showBookDialog by remember { mutableStateOf(false) }
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(CropImageContract()) {
         bitmap = getCroppedImage(context.contentResolver, it)
+        if (bitmap != null) showBookDialog = true
     }
 
     Scaffold(
@@ -165,6 +167,15 @@ fun MainScreen() {
             ) {
                 CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
                 showDialog = false
+            }
+        }
+
+        if (showBookDialog) {
+            BookDialog(
+                bitmap = bitmap,
+                onDismissRequest = { showBookDialog = false }) { title ->
+                Log.d("TAMBAH", "$title ditambahkan.")
+                showBookDialog = false
             }
         }
     }
