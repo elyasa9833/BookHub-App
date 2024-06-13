@@ -196,10 +196,10 @@ fun ListItem(book: Book) {
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(BookApi.getBookUrl(book.imageUrl))
+                .data(BookApi.getBookUrl(book.image))
                 .crossfade(true)
                 .build(),
-            contentDescription = stringResource(id = R.string.gambar, book.id),
+            contentDescription = stringResource(id = R.string.gambar, book.bookId),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
             error = painterResource(id = R.drawable.broken_image_24),
@@ -214,7 +214,7 @@ fun ListItem(book: Book) {
                 .background(Color(0f, 0f, 0f, 0.5f))
                 .padding(4.dp)
         ) {
-            Text(text = book.desc,
+            Text(text = book.title,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp,

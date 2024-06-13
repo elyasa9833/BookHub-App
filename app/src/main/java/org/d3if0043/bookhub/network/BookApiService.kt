@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 
-private const val BASE_URL = "https://raw.githubusercontent.com/elyasa9833/static-api/main/"
+private const val BASE_URL = "https://mainly-fond-cod.ngrok-free.app/d3if0043/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -20,7 +20,7 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface BookApiService {
-    @GET("data-dummy.json")
+    @GET("book.php")
     suspend fun getBook(): List<Book>
 
 }
@@ -31,7 +31,7 @@ object BookApi {
     }
 
     fun getBookUrl(imageUrl: String): String {
-        return "$imageUrl"
+        return "$BASE_URL/src/image/$imageUrl"
     }
 }
 
