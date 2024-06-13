@@ -28,7 +28,9 @@ private val retrofit = Retrofit.Builder()
 
 interface BookApiService {
     @GET("book.php")
-    suspend fun getBook(): List<Book>
+    suspend fun getBook(
+        @Header("Authorization") userId: String
+    ): List<Book>
 
     @Multipart
     @POST("book.php")
