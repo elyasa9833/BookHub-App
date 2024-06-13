@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -269,19 +271,35 @@ fun ListItem(book: Book) {
                 .padding(4.dp)
                 .height(150.dp)
         )
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
                 .background(Color(0f, 0f, 0f, 0.5f))
-                .padding(4.dp)
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = book.title,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 14.sp,
-                color = Color.White
-            )
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                Text(text = book.title,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    modifier = Modifier.fillMaxWidth(0.7f)
+                )
+            }
+            if(book.mine == 1){
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_delete_24),
+                        contentDescription = null,
+                        tint = colorResource(id = R.color.white)
+                    )
+                }
+            }
         }
     }
 }
