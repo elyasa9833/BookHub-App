@@ -72,6 +72,8 @@ import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -198,6 +200,7 @@ fun MainScreen() {
 fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
+    var refreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId) {
         viewModel.retrieveData(userId)
@@ -214,19 +217,28 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
         }
 
         ApiStatus.SUCCESS -> {
-            LazyVerticalGrid(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .padding(4.dp),
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(bottom = 80.dp)
-            ) {
-                items(data) {
-                    ListItem(book = it, onDelete = { bookId ->
-                        Log.d("ScreenContent", "Deleting book with ID: $bookId")
-                        viewModel.deleteData(userId, bookId)
-                    })
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing = refreshing),
+                onRefresh = {
+                    refreshing = true
+                    viewModel.retrieveData(userId)
+                    refreshing = false
+                },
+            ){
+                LazyVerticalGrid(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .padding(4.dp),
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(bottom = 80.dp)
+                ) {
+                    items(data) {
+                        ListItem(book = it, onDelete = { bookId ->
+                            Log.d("ScreenContent", "Deleting book with ID: $bookId")
+                            viewModel.deleteData(userId, bookId)
+                        })
+                    }
                 }
             }
 
