@@ -223,7 +223,10 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 items(data) {
-                    ListItem(book = it)
+                    ListItem(book = it, onDelete = { bookId ->
+                        Log.d("ScreenContent", "Deleting book with ID: $bookId")
+                        viewModel.deleteData(userId, bookId)
+                    })
                 }
             }
 
@@ -250,7 +253,18 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
 }
 
 @Composable
-fun ListItem(book: Book) {
+fun ListItem(book: Book, onDelete: (String) -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    DeleteDialog(
+        openDialog = showDialog,
+        onDismissRequest = { showDialog = false },
+        onConfirmation = {
+            onDelete(book.bookId.toString())
+            showDialog = false
+        }
+    )
+
     Box(
         modifier = Modifier
             .padding(4.dp)
@@ -292,7 +306,7 @@ fun ListItem(book: Book) {
                 )
             }
             if(book.mine == 1){
-                IconButton(onClick = {}) {
+                IconButton(onClick = { showDialog = true }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_delete_24),
                         contentDescription = null,

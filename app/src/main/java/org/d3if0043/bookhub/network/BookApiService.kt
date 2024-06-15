@@ -42,7 +42,7 @@ interface BookApiService {
         @Part image: MultipartBody.Part
     ): OpStatus
 
-    @DELETE("hewan.php")
+    @DELETE("book.php")
     suspend fun delete(
         @Header("Authorization") userId: String,
         @Query("bookId") bookId: String

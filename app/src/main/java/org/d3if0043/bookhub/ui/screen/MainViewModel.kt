@@ -72,6 +72,21 @@ class MainViewModel : ViewModel() {
         )
     }
 
+    fun deleteData(userId: String, bookId: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = BookApi.service.delete(userId, bookId)
+                if (result.status == "success")
+                    retrieveData(userId)
+                else
+                    throw Exception(result.message)
+            } catch (e: Exception) {
+                Log.d("MainViewModel", "Failure3: ${e.message}")
+                errorMessage.value = "Error: ${e.message}"
+            }
+        }
+    }
+
     fun clearMessage() {
         errorMessage.value = null
     }
