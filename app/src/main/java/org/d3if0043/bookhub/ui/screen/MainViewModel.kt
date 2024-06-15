@@ -40,12 +40,13 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun saveData(userId: String, title: String, bitmap: Bitmap) {
+    fun saveData(userId: String, title: String, description: String, bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = BookApi.service.postBook(
                     userId,
                     title.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    description.toRequestBody("text/plain".toMediaTypeOrNull()),
                     bitmap.toMultipartBody()
                 )
 

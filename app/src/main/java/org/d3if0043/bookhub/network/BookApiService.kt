@@ -39,6 +39,7 @@ interface BookApiService {
     suspend fun postBook(
         @Header("Authorization") userId: String,
         @Part("title") title: RequestBody,
+        @Part("description") description: RequestBody,
         @Part image: MultipartBody.Part
     ): OpStatus
 

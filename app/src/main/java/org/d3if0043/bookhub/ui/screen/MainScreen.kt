@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,6 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -184,8 +184,8 @@ fun MainScreen() {
         if (showBookDialog) {
             BookDialog(
                 bitmap = bitmap,
-                onDismissRequest = { showBookDialog = false }) { title ->
-                viewModel.saveData(user.email, title, bitmap!!)
+                onDismissRequest = { showBookDialog = false }) { title, description ->
+                viewModel.saveData(user.email, title, description, bitmap!!)
                 showBookDialog = false
             }
         }
@@ -277,46 +277,31 @@ fun ListItem(book: Book, onDelete: (String) -> Unit) {
         }
     )
 
-    Box(
+    Column(
         modifier = Modifier
             .padding(4.dp)
             .border(1.dp, Color.Gray),
-        contentAlignment = Alignment.BottomCenter
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(BookApi.getBookUrl(book.image))
-                .crossfade(true)
-                .build(),
-            contentDescription = stringResource(id = R.string.gambar, book.bookId),
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = R.drawable.loading_img),
-            error = painterResource(id = R.drawable.broken_image_24),
+
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-                .height(150.dp)
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-                .background(Color(0f, 0f, 0f, 0.5f))
                 .padding(4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Column(
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(BookApi.getBookUrl(book.image))
+                    .crossfade(true)
+                    .build(),
+                contentDescription = stringResource(id = R.string.gambar, book.bookId),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.loading_img),
+                error = painterResource(id = R.drawable.broken_image_24),
                 modifier = Modifier
-                    .padding(4.dp)
-            ) {
-                Text(text = book.title,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    modifier = Modifier.fillMaxWidth(0.7f)
-                )
-            }
+                    .fillMaxWidth()
+//                    .padding(4.dp)
+                    .height(150.dp)
+            )
             if(book.mine == 1){
                 IconButton(onClick = { showDialog = true }) {
                     Icon(
@@ -326,6 +311,31 @@ fun ListItem(book: Book, onDelete: (String) -> Unit) {
                     )
                 }
             }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+                .background(Color(0f, 0f, 0f, 0.5f))
+                .padding(4.dp)
+        ) {
+            Text(text = book.title,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 14.sp,
+                color = Color.White,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(text = book.description,
+                maxLines = 6,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 12.sp,
+                lineHeight = 12.sp,
+                color = Color.White,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

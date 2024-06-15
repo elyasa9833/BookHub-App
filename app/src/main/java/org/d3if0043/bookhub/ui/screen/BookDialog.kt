@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -38,9 +39,10 @@ import org.d3if0043.bookhub.ui.theme.BookHubTheme
 fun BookDialog(
     bitmap: Bitmap?,
     onDismissRequest: () -> Unit,
-    onConfirmation: (String) -> Unit
+    onConfirmation: (String, String) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -67,6 +69,17 @@ fun BookDialog(
                     ),
                     modifier = Modifier.padding(top = 8.dp)
                 )
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text(text = stringResource(id = R.string.description)) },
+                    maxLines = 1,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     horizontalArrangement = Arrangement.Center
@@ -78,8 +91,8 @@ fun BookDialog(
                         Text(text = stringResource(R.string.batal))
                     }
                     OutlinedButton(
-                        onClick = { onConfirmation(title) },
-                        enabled = title.isNotEmpty(),
+                        onClick = { onConfirmation(title, description) },
+                        enabled = title.isNotEmpty() && description.isNotEmpty(),
                         modifier = Modifier.padding(8.dp)
                     ) {
                         Text(text = stringResource(R.string.simpan))
@@ -98,7 +111,7 @@ fun AddDialogPreview() {
         BookDialog(
             bitmap = null,
             onDismissRequest = {},
-            onConfirmation = { _ -> }
+            onConfirmation = { _, _ -> }
         )
     }
 }
