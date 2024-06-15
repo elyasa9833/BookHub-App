@@ -56,7 +56,7 @@ object BookApi {
     }
 
     fun getBookUrl(imageUrl: String): String {
-        return "$BASE_URL/src/image/$imageUrl"
+        return "$BASE_URL" + "src/image/$imageUrl"
     }
 }
 
