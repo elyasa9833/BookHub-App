@@ -9,15 +9,13 @@ import org.d3if0043.bookhub.model.Book
 import org.d3if0043.bookhub.model.OpStatus
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
 
-private const val BASE_URL = "https://mainly-fond-cod.ngrok-free.app/d3if0043/"
+private const val BASE_URL = "https://petrolic-noise.000webhostapp.com/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -31,22 +29,23 @@ private val retrofit = Retrofit.Builder()
 interface BookApiService {
     @GET("book.php")
     suspend fun getBook(
-        @Header("Authorization") userId: String
+        @Query("userId") userId: String
     ): List<Book>
 
     @Multipart
     @POST("book.php")
     suspend fun postBook(
-        @Header("Authorization") userId: String,
+        @Part("userId") userId: RequestBody,
         @Part("title") title: RequestBody,
         @Part("description") description: RequestBody,
         @Part image: MultipartBody.Part
     ): OpStatus
 
-    @DELETE("book.php")
+    @Multipart
+    @POST("bookDelete.php")
     suspend fun delete(
-        @Header("Authorization") userId: String,
-        @Query("bookId") bookId: String
+        @Part("userId") userId: RequestBody,
+        @Part("bookId") bookId: RequestBody
     ): OpStatus
 }
 

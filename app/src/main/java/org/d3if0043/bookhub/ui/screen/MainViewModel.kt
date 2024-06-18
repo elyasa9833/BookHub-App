@@ -44,7 +44,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = BookApi.service.postBook(
-                    userId,
+                    userId.toRequestBody("text/plain".toMediaTypeOrNull()),
                     title.toRequestBody("text/plain".toMediaTypeOrNull()),
                     description.toRequestBody("text/plain".toMediaTypeOrNull()),
                     bitmap.toMultipartBody()
@@ -76,7 +76,10 @@ class MainViewModel : ViewModel() {
     fun deleteData(userId: String, bookId: String){
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = BookApi.service.delete(userId, bookId)
+                val result = BookApi.service.delete(
+                    userId.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    bookId.toRequestBody("text/plain".toMediaTypeOrNull())
+                )
                 if (result.status == "success")
                     retrieveData(userId)
                 else
